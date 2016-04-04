@@ -3,6 +3,8 @@ FunkyFellow1_1.ino
 Filter effect using state variable filters. 
 Thanks to Paul Stoffregen, www.PJRC.com, that made the great audio library fro Teensy! Plus all the other great stuff!
 This code can be loaded into a Teensy3.1/3.2 with a Audio sheild. Use a I2C 64x128 OLED screen to show the graphics. 
+Hold the On/Off switch for 1 sek to edit the input gain with pot1. 
+Activate sine modulation mode by holding Mode/tap button in 2 sek.
 All in all use the OpenEffectsBox from OnkartGromt. 
  */
 #include <EEPROM.h> 
