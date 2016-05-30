@@ -22,20 +22,21 @@ Adafruit_SSD1306 display(OLED_RESET);
 AudioSynthWaveform       waveform1;      //xy=106,573
 AudioSynthWaveformDc     dc1;            //xy=109,473
 AudioInputI2S            i2s1;           //xy=140,314
-AudioSynthWaveformDc     dc2;            //xy=140.88888549804688,358.8888854980469
+AudioSynthWaveformDc     dc2;            //xy=141,361
 AudioEffectMultiply      multiply2;      //xy=248,532
 AudioAnalyzePeak         peak3;          //xy=254,573
-AudioEffectMultiply      multiply3;      //xy=298.8888854980469,313.8888854980469
+AudioEffectMultiply      multiply3;      //xy=288,336
 AudioMixer4              mixer3;         //xy=393,492
 AudioFilterStateVariable filter1;        //xy=456,147
-AudioEffectMultiply      multiply1;      //xy=495,420
-AudioAnalyzePeak         peak1;          //xy=673,420
-AudioMixer4              mixer2;         //xy=759.0000915527344,88
+AudioEffectMultiply      multiply1;      //xy=544.0000305175781,413
+AudioAnalyzePeak         peak4;          //xy=590.8888854980469,491.8888854980469
+AudioAnalyzePeak         peak1;          //xy=694.0000305175781,429
 AudioFilterStateVariable filter2;        //xy=759,151
 AudioFilterStateVariable filter3;        //xy=759,204
 AudioFilterStateVariable filter4;        //xy=759,257
-AudioMixer4              mixer1;         //xy=891.0000305175781,210
-AudioMixer4              mixer4;         //xy=1187,295
+AudioMixer4              mixer2;         //xy=911,78
+AudioMixer4              mixer1;         //xy=911,216
+AudioMixer4              mixer4;         //xy=1101.0000305175781,295
 AudioAnalyzeFFT1024      fft1024_1;      //xy=1385,389
 AudioAnalyzePeak         peak2;          //xy=1394,297
 AudioOutputI2S           i2s2;           //xy=1394,342
@@ -44,34 +45,37 @@ AudioConnection          patchCord2(waveform1, peak3);
 AudioConnection          patchCord3(dc1, 0, multiply2, 0);
 AudioConnection          patchCord4(dc1, 0, mixer3, 0);
 AudioConnection          patchCord5(i2s1, 0, multiply3, 0);
-AudioConnection          patchCord6(dc2, 0, multiply3, 1);
-AudioConnection          patchCord7(multiply2, 0, mixer3, 1);
-AudioConnection          patchCord8(multiply3, 0, filter1, 0);
-AudioConnection          patchCord9(multiply3, fft1024_1);
-AudioConnection          patchCord10(multiply3, 0, mixer4, 3);
-AudioConnection          patchCord13(multiply3, 0, multiply1, 0);
-AudioConnection          patchCord14(mixer3, 0, multiply1, 1);
-AudioConnection          patchCord15(filter1, 0, filter2, 0);
-AudioConnection          patchCord16(filter1, 0, mixer2, 0);
-AudioConnection          patchCord17(filter1, 1, filter3, 0);
-AudioConnection          patchCord18(filter1, 1, mixer2, 1);
-AudioConnection          patchCord19(filter1, 2, filter4, 0);
-AudioConnection          patchCord20(filter1, 2, mixer2, 2);
-AudioConnection          patchCord21(multiply1, peak1);
-AudioConnection          patchCord22(multiply1, 0, filter1, 1);
-AudioConnection          patchCord23(multiply1, 0, filter2, 1);
-AudioConnection          patchCord24(multiply1, 0, filter3, 1);
-AudioConnection          patchCord25(multiply1, 0, filter4, 1);
-AudioConnection          patchCord26(mixer2, 0, mixer4, 0);
-AudioConnection          patchCord27(filter2, 0, mixer1, 0);
-AudioConnection          patchCord28(filter3, 1, mixer1, 1);
-AudioConnection          patchCord29(filter4, 2, mixer1, 2);
+AudioConnection          patchCord6(i2s1, 0, mixer4, 2);
+AudioConnection          patchCord7(dc2, 0, multiply3, 1);
+AudioConnection          patchCord8(multiply2, 0, mixer3, 1);
+AudioConnection          patchCord9(multiply3, 0, filter1, 0);
+AudioConnection          patchCord10(multiply3, fft1024_1);
+AudioConnection          patchCord11(multiply3, 0, multiply1, 0);
+AudioConnection          patchCord12(mixer3, 0, multiply1, 1);
+AudioConnection          patchCord13(mixer3, peak4);
+AudioConnection          patchCord14(filter1, 0, filter2, 0);
+AudioConnection          patchCord15(filter1, 0, mixer2, 0);
+AudioConnection          patchCord16(filter1, 1, filter3, 0);
+AudioConnection          patchCord17(filter1, 1, mixer2, 1);
+AudioConnection          patchCord18(filter1, 2, filter4, 0);
+AudioConnection          patchCord19(filter1, 2, mixer2, 2);
+AudioConnection          patchCord20(multiply1, peak1);
+AudioConnection          patchCord21(multiply1, 0, filter1, 1);
+AudioConnection          patchCord22(multiply1, 0, filter2, 1);
+AudioConnection          patchCord23(multiply1, 0, filter3, 1);
+AudioConnection          patchCord24(multiply1, 0, filter4, 1);
+AudioConnection          patchCord25(multiply1, 0, mixer4, 3);
+AudioConnection          patchCord26(filter2, 0, mixer1, 0);
+AudioConnection          patchCord27(filter3, 1, mixer1, 1);
+AudioConnection          patchCord28(filter4, 2, mixer1, 2);
+AudioConnection          patchCord29(mixer2, 0, mixer4, 0);
 AudioConnection          patchCord30(mixer1, 0, mixer4, 1);
-AudioConnection          patchCord31(mixer4, peak2);
-AudioConnection          patchCord32(mixer4, 0, i2s2, 0);
-AudioConnection          patchCord33(mixer4, 0, i2s2, 1);
-AudioControlSGTL5000     sgtl5000_1;     //xy=662.0000305175781,536.0000305175781
+AudioConnection          patchCord31(mixer4, 0, i2s2, 0);
+AudioConnection          patchCord32(mixer4, 0, i2s2, 1);
+AudioConnection          patchCord33(mixer4, peak2);
+AudioControlSGTL5000     sgtl5000_1;     //xy=662,536
 // GUItool: end automatically generated code
+
 
 
 //Pinout board rev1
@@ -112,6 +116,7 @@ int SW2ValueOld = 0;
 int Tap1ValueOld = 1;
 int Tap2ValueOld = 1;
 int CV1ValueOld = 0;
+int CV2ValueOld = 0;
 int Tap1Timer = 0;
 int Tap2Timer = 0;
 float margin  = 0.1;
@@ -136,17 +141,23 @@ unsigned long debounceDelay = 50;    // the debounce time; increase if the outpu
 float peak = 0.0;
 float peak_2 = 0.0;
 float peak_3 =0.0;
+float peak_4 =0.0;
 int spanfreq = 500;
 int spanfreqOld = 500;
 int offsetfreq = 201;
 int movingfreq = 500;
+int movingfreqOld = 500;
 int octave = 7;
-int octaveOld = 0;
-float level = 0.85;
+int octaveOld = 7;
+float level = 1;
 float modFreqTap = 2.0;
 float modFreq = 3;
 float modFreqOld = 2;
 float InLevel = 0;
+float outLevel = 4;
+float inLevel = 0.05;
+float bypassLevel = 0.42;
+float mixer3Level = 1.0;
 
 const int myInput = AUDIO_INPUT_LINEIN;
 
@@ -161,6 +172,7 @@ elapsedMillis tapInterval;  //timer that is used for tap tempo
 void setup() {
   AudioMemory(100);
   InLevel = float(EEPROM.read(0)/255.0);
+  outLevel = float(EEPROM.read(1));
   dc2.amplitude(InLevel, 20);
   sgtl5000_1.enable();  // Enable the audio shield
   sgtl5000_1.inputSelect(myInput);
@@ -174,11 +186,12 @@ void setup() {
   pinMode(ledPin3, OUTPUT);
   pinMode(Tap1, INPUT);
   pinMode(Tap2, INPUT);
-  mixer3.gain(0, 1);
+  mixer3.gain(0, mixer3Level);
   mixer3.gain(1, 0);
   mixer4.gain(0, 0);
   mixer4.gain(1, 0);
-  mixer4.gain(3, 2);  
+  mixer4.gain(2, bypassLevel);  
+  mixer4.gain(3, 0);  
   mixer1.gain(0, 1);    //24order filter
   mixer1.gain(1, 1);
   mixer1.gain(2, 1);
@@ -188,6 +201,7 @@ void setup() {
   mixer2.gain(2, 1);
   mixer2.gain(3, 0);
   waveform1.begin(2,2,WAVEFORM_SINE);
+  sgtl5000_1.inputSelect(myInput);
   sgtl5000_1.dacVolume (level);
   sgtl5000_1.autoVolumeControl(0,0,0,0.7,50,100);  //maxGain,response,hard limit,threshold,attack, decay
   sgtl5000_1.autoVolumeDisable();
@@ -215,16 +229,16 @@ void loop() {
   CV2Value = analogRead(CV2);      //EXP input
   
   Pot1Value = mapfloat(Pot1Value, 0, 1023, 1, 0);        //Sense
-  Pot2Value = mapfloat(Pot2Value, 0, 1023, 4, 0.7);      //Resonance
+  Pot2Value = mapfloat(Pot2Value, 0, 1023, 3, 0.7);      //Resonance
   GraphFreq = map(Pot3Value, 0, 1023, 90, 30);           //Moving point of Graph
-  Pot3Value = map(Pot3Value, 0, 1023, 1500, 150);        //Freq
-  modFreq  = mapfloat(Pot4Value, 0, 1023, 10.0, 1.0);    //ModFreq
+  Pot3Value = map(Pot3Value, 0, 1023, 1500, 250);        //Freq
+  modFreq  = mapfloat(Pot4Value, 0, 1023, 8.0, 0.5);    //ModFreq
   SW1Value = map(SW1Value, 0, 1023, 5, 0);               //Filter char
   SW1Value = constrain(SW1Value, 1, 5);
   SW2Value = map(SW2Value, 0, 1023, 5, 0);               //Direction
   SW2Value = constrain(SW2Value, 1, 5);
   CV1Value = mapfloat(CV1Value, 0, 1023, 10, 1);       //Sine modulation CV pedal input
-  CV2Value = map(CV2Value, 0, 600, 1500, 200);           //Freq expression pedal  
+  CV2Value = map(CV2Value, 0, 600, 1500, 250);           //Freq expression pedal  
 
 //********************ON -OFF handling**********************
   buttonState0 = OnOff.read();
@@ -255,6 +269,7 @@ void loop() {
   if (peak1.available())  peak = peak1.read();
   if (peak2.available())  peak_2 = peak2.read();    //Output peak
   if (peak3.available())  peak_3 = peak3.read();
+  if (peak4.available())  peak_4 = peak4.read();
   
   if (modulationMode == 0){
     analogWrite(ledPin2, peak_2*400);    //yellow LED
@@ -263,24 +278,34 @@ void loop() {
     }
   else analogWrite(ledPin2, (peak_3)*100);  //modulation active
   
-//******************** SET filter handling**********************  
+//******************** SET filter handling + expression pedal **********************  
   if (CV1Value <8.0 && modulationMode == 1){  //Check if CVinput is active
     modFreq = CV1Value;    //expression pedal overrides the potmeter
     }
   
   if ((CV2Value <80)||(CV2Value > 1400)) spanfreq = Pot3Value;  //Check if exp pedal is active
-  else spanfreq = CV2Value;
-  
-  if (SW2Value == 3) movingfreq = peak*2 * spanfreq + spanfreq ;
-  else if (SW2Value == 5) movingfreq = -peak *2* spanfreq + spanfreq ;
+  else spanfreq = (CV2Value+ CV2ValueOld)*0.5;
+   
+  if (SW2Value == 3) movingfreq = peak*20 * spanfreq + spanfreq ;
+  else if (SW2Value == 5) movingfreq = -peak *20* spanfreq + spanfreq ;
   else if (SW2Value == 1) movingfreq = spanfreq;    //not moving filter
-
+  
+  if (movingfreq <=250)movingfreq=250;
+  
+if ((movingfreq > movingfreqOld+ 4) || (movingfreq < movingfreqOld - 4)){
+  filter1.frequency(movingfreq);
+  filter2.frequency(movingfreq);
+  filter3.frequency(movingfreq);
+  filter4.frequency(movingfreq);
+}
+/*
 if ((spanfreq > spanfreqOld+ 4) || (spanfreq < spanfreqOld - 4)){
   filter1.frequency(spanfreq);
   filter2.frequency(spanfreq);
   filter3.frequency(spanfreq);
   filter4.frequency(spanfreq);
 }
+*/
 if ((Pot2Value > Pot2ValueOld+ 0.1) || (Pot2Value < Pot2ValueOld - 0.1)){
   filter1.resonance(Pot2Value);
   filter2.resonance(Pot2Value);
@@ -288,10 +313,19 @@ if ((Pot2Value > Pot2ValueOld+ 0.1) || (Pot2Value < Pot2ValueOld - 0.1)){
   filter4.resonance(Pot2Value);  
 }
 if ((octave > octaveOld+ 1) || (octave < octaveOld - 1)){
-  filter1.octaveControl(octave);
-  filter2.octaveControl(octave);
-  filter3.octaveControl(octave);
-  filter4.octaveControl(octave);
+  if (filterOrder == 12){
+    filter1.octaveControl(octave);
+    filter2.octaveControl(octave);
+    filter3.octaveControl(octave);
+    filter4.octaveControl(octave);
+  }
+  else if (filterOrder == 24){
+    float oct = octave /2;
+    filter1.octaveControl(oct);
+    filter2.octaveControl(oct);
+    filter3.octaveControl(oct);
+    filter4.octaveControl(oct);
+  }    
 }
 
 
@@ -302,7 +336,8 @@ if (!Tap2Value && (Tap2Value == Tap2ValueOld) && modulationMode == 0 && Tap2Pres
   Tap2Timer++;
   if (Tap2Timer > 15){
     mixer3.gain(0,0);
-    mixer3.gain(1,1);
+    mixer3.gain(1,mixer3Level);
+    mixer4.gain(3,outLevel*0.5);
     modulationMode = 1;  
     analogWrite(ledPin2,255);
     digitalWrite(ledPin3,HIGH);
@@ -313,8 +348,9 @@ else if (!Tap2Value && (Tap2Value == Tap2ValueOld) && modulationMode == 1 && Tap
   //Serial.print("Modulation\n");
   Tap2Timer++;
   if (Tap2Timer > 15){
-    mixer3.gain(0,1);
+    mixer3.gain(0,mixer3Level);
     mixer3.gain(1,0);
+    mixer4.gain(3,0);
     modulationMode = 0;
     analogWrite(ledPin2,255);
     digitalWrite(ledPin3,LOW);
@@ -341,14 +377,14 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
   if (ledStateONOFF == 0){
       mixer4.gain(0, 0);
       mixer4.gain(1, 0);
-      mixer4.gain(2, 0);
-      mixer4.gain(3, 2);
+      mixer4.gain(2, bypassLevel);
+      mixer4.gain(3, 0);
   }      
   else {  
-      mixer4.gain(3, 0);  //Always turn off bypass signal
+      mixer4.gain(2, 0);  //Always turn off bypass signal
     if (SW1Value == 3) {  //HP
       if (filterOrder == 12) { //   12db/dec
-        mixer4.gain(0, 2);
+        mixer4.gain(0, outLevel);
         mixer4.gain(1, 0);
         mixer2.gain(0, 0);
         mixer2.gain(1, 0);  
@@ -356,7 +392,7 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
         }
       else if (filterOrder == 24) {    //24db/dec
         mixer4.gain(0, 0);
-        mixer4.gain(1, 2);
+        mixer4.gain(1, outLevel);
         mixer1.gain(0, 0);
         mixer1.gain(1, 0);  
         mixer1.gain(2, 1);         
@@ -364,7 +400,7 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
     }
     else if (SW1Value == 1) {  //BP  
        if (filterOrder == 12) { //   12db/dec
-        mixer4.gain(0, 2);
+        mixer4.gain(0, outLevel);
         mixer4.gain(1, 0);
         mixer2.gain(0, 0);
         mixer2.gain(1, 1);  
@@ -372,7 +408,7 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
         }
       else if (filterOrder == 24) {    //24db/dec
         mixer4.gain(0, 0);
-        mixer4.gain(1, 2);
+        mixer4.gain(1, outLevel);
         mixer1.gain(0, 0);
         mixer1.gain(1, 1);  
         mixer1.gain(2, 0);         
@@ -380,7 +416,7 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
     }
     else if (SW1Value == 5) { //LowPass
        if (filterOrder == 12) { //   12db/dec
-        mixer4.gain(0, 2);
+        mixer4.gain(0, outLevel);
         mixer4.gain(1, 0);
         mixer2.gain(0, 1);
         mixer2.gain(1, 0);  
@@ -388,7 +424,7 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
         }
       else if (filterOrder == 24) {    //24db/dec
         mixer4.gain(0, 0);
-        mixer4.gain(1, 2);
+        mixer4.gain(1, outLevel);
         mixer1.gain(0, 1);
         mixer1.gain(1, 0);  
         mixer1.gain(2, 0);         
@@ -397,12 +433,16 @@ if ((modFreq > modFreqOld+ 0.1) || (modFreq < modFreqOld - 0.1)){
   }  
 display.clearDisplay();
 
-if (!Tap1Value && (Tap1Value == Tap1ValueOld)){    //When Mode/tap is held down you can adjust the input gain of the input
+
+//*******************INPUT/OUTPUT LEVEL ADJUST************************
+if (SW1Value == 5){    //LP pos for input level
+ if (!Tap1Value && (Tap1Value == Tap1ValueOld)){    //When Mode/tap is held down you can adjust the input gain of the input
  // Serial.print("TIME");
-  Tap1Timer++;
+   Tap1Timer++;
   if (Tap1Timer > 15){
     InLevel = analogRead(Pot1);
-    InLevel = mapfloat(InLevel,0,1023,1,0.1);
+    InLevel = mapfloat(InLevel,0,1023,10,1);
+    InLevel = InLevel * inLevel; //multiply by constant inLevel
     dc2.amplitude(InLevel,10);
     delay(100);
     analogWrite(ledPin2, 255);  
@@ -413,20 +453,49 @@ if (!Tap1Value && (Tap1Value == Tap1ValueOld)){    //When Mode/tap is held down 
     display.print("Input:");
     display.print(InLevel); 
     display.display();
+    }
   }
-}
-else if (Tap1Timer > 15){    //only write to EEPROM once
+  else if (Tap1Timer > 15){    //only write to EEPROM once
     EEPROM.write(0, InLevel*255);
   //  Serial.println(InLevel);
     Tap1Timer = 0;
-}
-
-else if (Tap1Value){
-
-//  peak = peak1.read();   //read the signal output peak
+  }
+  else if (Tap1Value){
+  //  peak = peak1.read();   //read the signal output peak
   if (peak == -1)(peak = 0);
   analogWrite(ledPin2, peak*100);
+  }
 }
+
+if (SW1Value == 3){    //HP pos for Output level
+ if (!Tap1Value && (Tap1Value == Tap1ValueOld)){    //When Mode/tap is held down you can adjust the input gain of the input
+ // Serial.print("TIME");
+   Tap1Timer++;
+  if (Tap1Timer > 15){
+    outLevel = analogRead(Pot1);
+    outLevel = mapfloat(outLevel,0,1023,10,1);
+    delay(100);
+    analogWrite(ledPin2, 255);  
+    //display.clearDisplay();   
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(5, 10);
+    display.print("Output:");
+    display.print(outLevel); 
+    display.display();
+    }
+  }
+  else if (Tap1Timer > 15){    //only write to EEPROM once
+    EEPROM.write(1, outLevel);
+    Tap1Timer = 0;
+  }
+  else if (Tap1Value){
+  //  peak = peak1.read();   //read the signal output peak
+  if (peak == -1)(peak = 0);
+  analogWrite(ledPin2, peak*100);
+  }
+}
+
 if(fft1024_1.available()){        //Display FFT on screen
  // display.clearDisplay();
   for (int i=0; i<42; i++) {
@@ -458,11 +527,13 @@ if(fft1024_1.available()){        //Display FFT on screen
     display.drawLine(GraphFreq, 35-Pot2Value*4, GraphFreq-5, 32, WHITE);
     display.drawLine(GraphFreq+5, 32, GraphFreq+(48-filterOrder), 64, WHITE);
  }  
+  //int cpuCap = AudioProcessorUsageMax();
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(80, 10);
   display.print("fc:");
   display.print(movingfreq); 
+  //display.print(CV2Value);  
   display.display();
 /*
    Serial.print(" CV1Value: ");
@@ -481,6 +552,10 @@ if(fft1024_1.available()){        //Display FFT on screen
    Tap1ValueOld = Tap1Value;
    Tap2ValueOld = Tap2Value;   
    CV1ValueOld = CV1Value;
+   CV2ValueOld = CV2Value;
    modFreqOld = modFreq;
    spanfreqOld = spanfreq;
+   movingfreqOld = movingfreq;
+   //AudioInterrupts();
+   //AudioNoInterrupts();
 }
