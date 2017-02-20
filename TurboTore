@@ -1,0 +1,924 @@
+#include <Adafruit_GFX.h>
+
+/*
+TurboTore.ino
+Eq effect using IIR filters. 
+Thanks to Paul Stoffregen, www.PJRC.com, that made the great audio library fro Teensy! Plus all the other great stuff!
+This code can be loaded into a Teensy3.1/3.2 with a OnkartGromt OpenEffects project platform. Use a I2C 64x128 OLED screen to show the graphics. 
+Hold the On/Off switch for 1 sek to edit the input gain with pot1. 
+All in all use the OpenEffectsBox ref2.1 from OnkartGromt. 
+ */
+#include <EEPROM.h> 
+#include <Bounce.h> 
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+#include <Adafruit_NeoPixel.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <math.h>
+#include<string.h>
+using namespace std;
+
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+//Blue HW:
+//#define PIN            8
+//RED HW:
+#define PIN            3
+
+#define NUMPIXELS      10
+#define bands          6
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+// GUItool: begin automatically generated code
+AudioSynthNoiseWhite     noise1;         //xy=125.88888549804688,617.8888854980469
+AudioInputI2S            i2s1;           //xy=134.88888549804688,578
+AudioMixer4              mixer5;         //xy=258.8888854980469,590
+AudioSynthWaveformDc     dc2;            //xy=259.8888854980469,657
+AudioEffectMultiply      multiply3;      //xy=408.8888854980469,650
+AudioFilterBiquad        biquad5;        //xy=452.8889465332031,529.8888854980469
+AudioFilterBiquad        biquad3;        //xy=453.8889465332031,451.8888854980469
+AudioFilterBiquad        biquad4;        //xy=453.88897705078125,488.8888854980469
+AudioFilterBiquad        biquad6;        //xy=453.8889465332031,570.8888854980469
+AudioFilterBiquad        biquad2;        //xy=457.8889465332031,413.888916015625
+AudioFilterBiquad        biquad1;        //xy=458.88897705078125,373
+AudioSynthWaveformDc     dc7; //xy=461.8888854980469,253.88888549804688
+AudioSynthWaveformDc     dc8; //xy=462.8888854980469,294.8888854980469
+AudioSynthWaveformDc     dc6; //xy=463.8888854980469,216.88888549804688
+AudioSynthWaveformDc     dc5; //xy=464.8888854980469,177.88888549804688
+AudioSynthWaveformDc     dc4;  //xy=465.8888854980469,140.88888549804688
+AudioSynthWaveformDc     dc3; //xy=466.8888854980469,103.88888549804688
+AudioAnalyzePeak         peak1;          //xy=542.8889465332031,650
+AudioEffectMultiply      multiply2; //xy=645.888916015625,342.8888854980469
+AudioEffectMultiply      multiply4; //xy=645.8889465332031,377.8888854980469
+AudioEffectMultiply      multiply5; //xy=645.8889465332031,411.8888854980469
+AudioEffectMultiply      multiply6; //xy=646.888916015625,446.8888854980469
+AudioEffectMultiply      multiply8; //xy=646.888916015625,517.8888854980469
+AudioEffectMultiply      multiply7; //xy=647.888916015625,481.8888854980469
+AudioMixer4              mixer1;         //xy=831.8889465332031,433.8888854980469
+AudioMixer4              mixer4;         //xy=916.8889465332031,534
+AudioSynthWaveformDc     dc1;            //xy=916.8889465332031,601.8888854980469
+AudioEffectMultiply      multiply1;      //xy=1068.8889465332031,539.8888854980469
+AudioMixer4              mixer2;         //xy=1215.8889465332031,558.8888854980469
+AudioAnalyzePeak         peak2;          //xy=1350.8889465332031,540
+AudioOutputI2S           i2s2;           //xy=1351.8889465332031,590
+AudioConnection          patchCord1(noise1, 0, mixer5, 3);
+AudioConnection          patchCord2(i2s1, 0, mixer5, 0);
+AudioConnection          patchCord3(i2s1, 1, mixer5, 1);
+AudioConnection          patchCord4(mixer5, 0, multiply3, 0);
+AudioConnection          patchCord5(mixer5, biquad1);
+AudioConnection          patchCord6(mixer5, biquad2);
+AudioConnection          patchCord7(mixer5, biquad3);
+AudioConnection          patchCord8(mixer5, biquad4);
+AudioConnection          patchCord9(mixer5, biquad5);
+AudioConnection          patchCord10(mixer5, biquad6);
+AudioConnection          patchCord11(dc2, 0, multiply3, 1);
+AudioConnection          patchCord12(multiply3, peak1);
+AudioConnection          patchCord13(biquad5, 0, multiply7, 0);
+AudioConnection          patchCord14(biquad3, 0, multiply5, 0);
+AudioConnection          patchCord15(biquad4, 0, multiply6, 0);
+AudioConnection          patchCord16(biquad6, 0, multiply8, 0);
+AudioConnection          patchCord17(biquad2, 0, multiply4, 0);
+AudioConnection          patchCord18(biquad1, 0, multiply2, 0);
+AudioConnection          patchCord19(dc7, 0, multiply7, 1);
+AudioConnection          patchCord20(dc8, 0, multiply8, 1);
+AudioConnection          patchCord21(dc6, 0, multiply6, 1);
+AudioConnection          patchCord22(dc5, 0, multiply5, 1);
+AudioConnection          patchCord23(dc4, 0, multiply4, 1);
+AudioConnection          patchCord24(dc3, 0, multiply2, 1);
+AudioConnection          patchCord25(multiply2, 0, mixer1, 0);
+AudioConnection          patchCord26(multiply4, 0, mixer1, 1);
+AudioConnection          patchCord27(multiply5, 0, mixer1, 2);
+AudioConnection          patchCord28(multiply6, 0, mixer1, 3);
+AudioConnection          patchCord29(multiply8, 0, mixer4, 2);
+AudioConnection          patchCord30(multiply7, 0, mixer4, 1);
+AudioConnection          patchCord31(mixer1, 0, mixer4, 0);
+AudioConnection          patchCord32(mixer4, 0, multiply1, 0);
+AudioConnection          patchCord33(dc1, 0, multiply1, 1);
+AudioConnection          patchCord34(multiply1, 0, mixer2, 0);
+AudioConnection          patchCord35(mixer2, peak2);
+AudioConnection          patchCord36(mixer2, 0, i2s2, 0);
+AudioConnection          patchCord37(mixer2, 0, i2s2, 1);
+AudioControlSGTL5000     sgtl5000_1;     //xy=745.8889465332031,778.0000915527344
+// GUItool: end automatically generated code
+
+//Pinout board rev1
+int Pot1 = A6;    // select the input pin for the potentiometer
+int Pot2 = A3;    // select the input pin for the potentiometer
+int Pot3 = A2;    // select the input pin for the potentiometer
+int Pot4 = A1;    // select the input pin for the potentiometer
+int CV1 = A10;
+int CV2 = A11;
+
+//For the RED pcb
+int Tap1 = 0; 
+int Tap2 = 1;
+
+//For Blue PCB:
+//int Tap1 = 2;
+//int Tap2 = 3;
+
+int SW1 = A12;
+int SW2 = A13;
+
+//int ledPin1 = 3;      // select the pin for the LED strip
+int relayL = 4;      // select the pin for the RelayL
+int relayR = 5;      // select the pin for the RelayR
+
+//Variables for values
+boolean Tap1Value = 0;
+boolean Tap2Value = 0;
+float Pot1Value = 0;  
+float Pot2Value = 0;  
+float Pot3Value = 0;  
+float Pot4Value = 0;  
+int SW1Value = 0;
+int SW2Value = 0;
+float CV1Value = 0;
+float CV2Value = 0;
+float Pot1ValueOld = 0;  // variable to store the previous value
+float Pot2ValueOld = 0;  
+float Pot3ValueOld = 0;  
+float Pot4ValueOld = 0;  
+int SW1ValueOld = 0;
+int SW2ValueOld = 0;
+int Tap1ValueOld = 1;
+int Tap2ValueOld = 1;
+int CV1ValueOld = 0;
+int CV2ValueOld = 0;
+int Tap1Timer = 0;
+int Tap2Timer = 0;
+float margin  = 0.1;
+int modulationMode = 0;
+boolean Tap2Pressed = 0;
+int filterOrder = 24;
+float ffund = 0;
+
+// Variables 
+int ledStateONOFF = LOW;         // the current state of the output pin
+int ledStateONOFF_old = LOW;
+int buttonState0;             // the current reading from the input pin
+int lastButtonState0 = LOW;   // the previous reading from the input pin
+int ledStateBOOST = LOW;         // the current state of the output pin
+int buttonState1;             // the current reading from the input pin
+int lastButtonState1 = LOW;   // the previous reading from the input pin
+
+unsigned long lastDebounceTime0 = 0;  // the last time the output pin was toggled
+unsigned long lastDebounceTime1 = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+
+float peak = 0.0;
+float peak_2 = 0.0;
+float peak_3 =0.0;
+float peak_4 =0.0;
+int spanfreq = 500;
+int spanfreqOld = 500;
+int offsetfreq = 201;
+int movingfreq = 500;
+int movingfreqOld = 500;
+int octave = 7;
+int octaveOld = 7;
+float level = 1;
+float modFreqTap = 2.0;
+float modFreq = 3;
+float modFreqOld = 2;
+float InLevel = 1;
+float outLevel = 1;
+float inLevel = 0.05;
+float bypassLevel = 0.42;
+float mixer3Level = 1.0;
+float maxFreq = 20000;
+int lastParam = 0;
+
+struct presets {
+  float LevelBand[bands];
+  float QBand[bands];
+  unsigned int FreqBand[bands];
+}  ;
+//new version:
+int actualBand = 0; //0-4
+float levelBand[bands] = {30,35, 40, 25, 50,60};
+float levelBandScaled[bands] = {30,35, 40, 25, 50,60};
+float levelBanddB[bands] = {0,0,0, 0, 0,0};
+unsigned int freqBand[bands] = {30, 160, 320, 640, 2000,16000};
+float freqBandDefault[bands] = {80, 160, 320, 640, 2000,16000};
+float freqBandScaled[bands] = {4, 12, 32, 64, 110,110};
+float slopeBand[bands] = {.7,.7,.7,.7,.7,.7};
+float Qlevel[bands] = {1,1,1,1,1,1};
+int updateFilter = 1;
+int savePreset = 0;
+int loadPreset = 0;
+int actualPreset = 1;
+int numberOfPresets = 10;
+unsigned char loByte;
+unsigned char hiByte;
+uint32_t off =pixels.Color(0,0,0);
+uint32_t blue =pixels.Color(0,0,50);
+uint32_t red =pixels.Color(0,50,0);
+uint32_t green =pixels.Color(40,0,0);
+int VUlag = 0;
+const int myInput = AUDIO_INPUT_LINEIN;
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+Bounce OnOff = Bounce(Tap1, 30 ); 
+Bounce BoostOnOff = Bounce(Tap2, 30); 
+elapsedMillis holdTime;
+
+elapsedMillis tapInterval;  //timer that is used for tap tempo
+
+void setup() {
+  AudioMemory(180);
+  pixels.begin();
+  for (int i = 0;i<NUMPIXELS;i++){
+    pixels.setPixelColor(i,off);
+   } 
+  //pixels.setPixelColor(0, pixels.Color(50,0,0));
+  pixels.setPixelColor(0,green);
+  pixels.show();
+  InLevel = float(EEPROM.read(0)/255.0);
+  outLevel = float(EEPROM.read(1));
+  dc2.amplitude(InLevel, 20);
+  sgtl5000_1.enable();  // Enable the audio shield
+  sgtl5000_1.inputSelect(myInput);
+  sgtl5000_1.volume(0.8);
+  sgtl5000_1.lineInLevel(13);   // 3.12Vp-p
+  sgtl5000_1.lineOutLevel(21); // 3.16Vp-p
+  //READ PRESET FROM EEPROM
+  if (EEPROM.read(10) == 0) EEPROM.write(10,1);
+  
+  
+  //pinMode(ledPin1, OUTPUT); ONLY WITH RED BOARD
+  pinMode(relayL, OUTPUT);
+  pinMode(relayR, OUTPUT);
+  pinMode(Tap1, INPUT);
+  pinMode(Tap2, INPUT);
+
+  mixer4.gain(0, 1);
+  mixer4.gain(1, 2);
+  mixer4.gain(2, 2);  
+  mixer4.gain(3, 0);  
+
+  mixer5.gain(0, 0.5);    //INPUT mixer
+  mixer5.gain(1, 0.5);
+  mixer5.gain(2, 0);
+  mixer5.gain(3, 0);  
+  
+  mixer1.gain(0, 2);
+  mixer1.gain(1, 2);
+  mixer1.gain(2, 2);  
+  mixer1.gain(3, 2);  
+  
+  mixer2.gain(0,2);  //outputlevel master
+  dc1.amplitude(0.5,20);
+  dc3.amplitude(0.5,20);
+  dc4.amplitude(0.5,20);
+  dc5.amplitude(0.5,20);
+  dc6.amplitude(0.5,20);
+  dc7.amplitude(0.5,20);  
+  dc8.amplitude(0.5,20);  
+  
+  sgtl5000_1.inputSelect(myInput);
+  sgtl5000_1.dacVolume (level);
+  sgtl5000_1.autoVolumeControl(0,0,0,0.7,50,100);  //maxGain,response,hard limit,threshold,attack, decay
+  sgtl5000_1.autoVolumeDisable();
+  Serial.begin(115200);
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
+  display.clearDisplay();
+  pixels.show();
+  delay(100);
+}
+
+//Main loop
+void loop() {
+  OnOff.update();      //update the bounce
+  BoostOnOff.update();
+
+  // read the value from the pots and buttons:
+  Pot1Value = analogRead(Pot1);    //Level
+  Pot2Value = analogRead(Pot3);    //Width
+  Pot3Value = analogRead(Pot2);    //Freq
+  Pot4Value = analogRead(Pot4);    //Mode
+  Tap1Value = digitalRead(Tap1);   //On off
+  Tap2Value = digitalRead(Tap2);   //Mode/Tap
+  SW1Value = analogRead(SW1);      //Filter char
+  SW2Value = analogRead(SW2);      //Direction
+  CV1Value = analogRead(CV1);      //EXP input
+ // CV2Value = analogRead(CV2);      //EXP input
+  
+  Pot1Value = mapfloat(Pot1Value, 0, 1023, 0,2);         //Gain
+  Pot2Value = mapfloat(Pot2Value, 0, 1023, 1.4, 0.2);    //Q
+  Pot4Value = mapfloat(Pot4Value, 0, 1023, 1, 0.1);      //OutputLevel
+  SW1Value = map(SW1Value, 0, 1023, 5, 0);               //Filter char
+  SW1Value = constrain(SW1Value, 1, 5);
+  SW2Value = map(SW2Value, 0, 1023, 5, 0);               //Direction
+  SW2Value = constrain(SW2Value, 1, 5);
+  CV1Value = mapfloat(CV1Value, 0, 1023, 0, 2.8);         //Exp pedal 0-2,5V
+ // CV2Value = map(CV2Value, 0, 600, 1500, 250);           //NOT USED
+
+//********************ON -OFF handling**********************
+  buttonState0 = OnOff.read();
+  if (lastButtonState0 != buttonState0){   
+      // only toggle the state if the new button state is HIGH
+      if (buttonState0 == LOW) {
+        ledStateONOFF = !ledStateONOFF;
+      }
+  }
+  buttonState1 = BoostOnOff.read();
+  if (lastButtonState1 != buttonState1){ 
+      // only toggle the state if the new button state is HIGH
+      if (buttonState1 == LOW) {
+        ledStateBOOST = !ledStateBOOST;
+      }
+  } 
+  // set the outputs:
+  if (ledStateONOFF != ledStateONOFF_old){  
+    pixels.setPixelColor(2, pixels.Color(ledStateONOFF*30,(ledStateONOFF*30),ledStateONOFF*30)); // ONOFF bright white color. 
+    digitalWrite(relayL, ledStateONOFF); 
+    digitalWrite(relayR, ledStateONOFF);
+    ledStateONOFF_old = ledStateONOFF; 
+    pixels.show(); // This sends the updated pixel color to the hardware.  
+  }
+  lastButtonState0 = buttonState0;  //save readings to next round
+  lastButtonState1 = buttonState1;
+  
+//********************PRESET handling**********************
+//
+if (SW2Value == 1){
+  actualPreset--;
+  if (actualPreset <0)actualPreset = numberOfPresets;
+  delay(50);
+  }
+if (SW2Value == 5){
+  actualPreset++;
+  if (actualPreset > numberOfPresets)actualPreset =0;
+  delay(50);
+  }
+    
+  //read the signal input peak
+  if (peak1.available())  peak = peak1.read();
+  if (peak2.available())  peak_2 = peak2.read();    //Output peak
+  
+    //pixels.setPixelColor(1, pixels.Color((peak_3)*100,(peak_3)*100,20));
+    //pixels.show();
+  
+//******************** SET filter handling + expression pedal **********************  
+
+if (SW1Value == 5){
+  actualBand--;
+  if (actualBand <0)actualBand =5;
+  delay(50);
+  }
+if (SW1Value == 1){
+  actualBand++;
+  if (actualBand >5)actualBand =0;
+  delay(50);
+  }
+  
+if ((Pot1Value > Pot1ValueOld+ 0.1) || (Pot1Value < Pot1ValueOld - 0.1)){  //LEVEL adjust
+   float value = mapfloat(Pot1Value, 0, 1023, 0,2);         //Gain
+   float oldLevel = levelBanddB[actualBand];
+   levelBanddB[actualBand] = fscale (0,2,1,0,value,1); 
+   levelBand[actualBand] = Pot1Value*20;  //values for OLED
+
+     if (actualBand == 0) dc3.amplitude(levelBanddB[actualBand],20);
+     else if (actualBand == 1) dc4.amplitude(levelBanddB[actualBand],20);
+     else if (actualBand == 2) dc5.amplitude(levelBanddB[actualBand],20);
+     else if (actualBand == 3) dc6.amplitude(levelBanddB[actualBand],20);
+     else if (actualBand == 4) dc7.amplitude(levelBanddB[actualBand],20);
+     else if (actualBand == 5) dc8.amplitude(levelBanddB[actualBand],20);     
+
+   lastParam = 0;
+}
+
+if ((Pot2Value > Pot2ValueOld+ 0.01) || (Pot2Value < Pot2ValueOld - 0.01)){  //Q values
+  updateFilter = 1;
+  slopeBand[actualBand] = Pot2Value;
+  lastParam = 1;
+}
+
+if ((Pot3Value > Pot3ValueOld+ 3) || (Pot3Value < Pot3ValueOld - 3)) {    //Corner frequensy
+double distance = 0.8;
+  if (actualBand == 0)freqBand[actualBand] = map(Pot3Value, 0, 1023, (freqBand[actualBand+1]*(distance)), 20);
+  if (actualBand == 1)freqBand[actualBand] = map(Pot3Value, 0, 1023, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance)));
+  if (actualBand == 2)freqBand[actualBand] = map(Pot3Value, 0, 1023, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance)));    
+  if (actualBand == 3)freqBand[actualBand] = map(Pot3Value, 0, 1023, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance)));
+  if (actualBand == 4)freqBand[actualBand] = map(Pot3Value, 0, 1023, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance))); 
+  if (actualBand == 5)freqBand[actualBand] = map(Pot3Value, 0, 1023, 20000, (freqBand[actualBand-1]*2)); //set lower limit 2k!
+  updateFilter = 1;
+  lastParam = 2;
+}
+
+if ((Pot4Value > Pot4ValueOld+ 0.1) || (Pot4Value < Pot4ValueOld - 0.1)){  //Master Level
+   outLevel = Pot4Value;  ///fix
+   dc1.amplitude(outLevel,20);
+   lastParam = 3; 
+}
+
+if ((CV1Value > CV1ValueOld+ 0.2) || (CV1Value < CV1ValueOld - 0.2)){  //EXP Level
+  if(lastParam == 0){
+     float oldLevel = levelBanddB[actualBand];
+     levelBanddB[actualBand] = fscale (0,2,2,0,CV1Value,1); 
+     levelBand[actualBand] = CV1Value*20;  //values for OLED
+     Serial.println(oldLevel-levelBanddB[actualBand]);
+     if (actualBand <4)mixer1.gain(actualBand, levelBanddB[actualBand]);
+     else if (actualBand == 4) mixer4.gain(1, levelBanddB[actualBand]);
+     else if (actualBand == 5) mixer4.gain(2, levelBanddB[actualBand]);
+     lastParam = 0;
+  }
+  if(lastParam == 1){ 
+    updateFilter = 1;
+    slopeBand[actualBand] = CV1Value;
+    lastParam = 1;
+  }
+  if(lastParam == 2){
+    double distance = 0.8;
+    if (actualBand == 0)freqBand[actualBand] = map(CV1Value, 0, 2, (freqBand[actualBand+1]*(distance)), 20);
+    if (actualBand == 1)freqBand[actualBand] = map(CV1Value, 0, 2, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance)));
+    if (actualBand == 2)freqBand[actualBand] = map(CV1Value, 0, 2, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance)));    
+    if (actualBand == 3)freqBand[actualBand] = map(CV1Value, 0, 2, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance)));
+    if (actualBand == 4)freqBand[actualBand] = map(CV1Value, 0, 2, (freqBand[actualBand+1]*(distance)), (freqBand[actualBand-1]*(1+distance))); 
+    if (actualBand == 5)freqBand[actualBand] = map(CV1Value, 0, 2, 20000, (freqBand[actualBand-1]*2)); //set lower limit 2k!
+    updateFilter = 1;
+    lastParam = 2;
+  }    
+}
+
+if (updateFilter == 1){  
+    biquad1.setHighpass(2,freqBand[0],slopeBand[0]);
+    biquad1.setHighpass(3,freqBand[0],slopeBand[0]); 
+    biquad1.setLowpass(0,freqBand[1],0.707);
+    biquad1.setLowpass(1,freqBand[1],0.707);
+    
+    biquad2.setHighpass(2,freqBand[1],slopeBand[1]);
+    biquad2.setHighpass(3,freqBand[1],slopeBand[1]); 
+    biquad2.setLowpass(0,freqBand[2],0.707);
+    biquad2.setLowpass(1,freqBand[2],0.707);
+    
+    biquad3.setHighpass(2,freqBand[2],slopeBand[2]);
+    biquad3.setHighpass(3,freqBand[2],slopeBand[2]);     
+    biquad3.setLowpass(0,freqBand[3],0.707);
+    biquad3.setLowpass(1,freqBand[3],0.707);
+    
+    biquad4.setHighpass(2,freqBand[3],slopeBand[3]);
+    biquad4.setHighpass(3,freqBand[3],slopeBand[3]);     
+    biquad4.setLowpass(0,freqBand[4],0.707);
+    biquad4.setLowpass(1,freqBand[4],0.707);
+    
+    biquad5.setHighpass(2,freqBand[4],slopeBand[4]);
+    biquad5.setHighpass(3,freqBand[4],slopeBand[4]);     
+    biquad5.setLowpass(0,freqBand[5],0.707);
+    biquad5.setLowpass(1,freqBand[5],0.707);
+    
+    biquad6.setHighpass(2,freqBand[5],slopeBand[5]);
+    biquad6.setHighpass(3,freqBand[5],slopeBand[5]);  
+    biquad6.setLowpass(0,freqBand[6],0.707);
+    biquad6.setLowpass(1,freqBand[6],0.707);    
+      
+    updateFilter = 0;
+}
+
+
+//********************Load and saving presets **********************
+if (BoostOnOff.fallingEdge()){
+  holdTime = 0;
+  Serial.println("pushed");
+ }
+if (!BoostOnOff.read() && holdTime >1500) {
+        savePreset = 1;  
+        pixels.setPixelColor(1, green);    
+        pixels.show();
+        Serial.println(holdTime);
+        Serial.println("Save");
+
+  }
+else if (BoostOnOff.risingEdge() && (holdTime >600) && (holdTime <1500)) {
+        actualPreset++;  
+        if (actualPreset >=10)actualPreset = 0;
+        loadPreset = 1;
+        pixels.setPixelColor(1, red);    
+        pixels.show();
+        Serial.print("Loading new Preset: ");
+        Serial.println(actualPreset);
+        delay(500);
+  }     
+else if (BoostOnOff.risingEdge()){
+        loadPreset = 1;
+        Serial.print("Load");
+        Serial.println(holdTime);
+   }
+   
+      
+if (savePreset == 1){
+  for (int i = 0;i<bands;i++){
+    uint16_t value = (uint16_t)(levelBand[i]*100);
+    loByte = uint8_t(value & 0x00ff);
+    hiByte = uint8_t((value >> 8 )& 0x00ff);     
+    EEPROM.write(20+2*i+actualPreset*70,(loByte));
+    EEPROM.write(20+1+2*i+actualPreset*70,(hiByte));
+    value = (uint16_t)(slopeBand[i]*100);    
+    loByte = uint8_t(value & 0x00ff);
+    hiByte = uint8_t((value >> 8 )& 0x00ff);  
+    EEPROM.write(40+2*i+actualPreset*70,(loByte)); 
+    EEPROM.write(40+1+2*i+actualPreset*70,(hiByte));    
+    loByte = uint8_t(freqBand[i] & 0x00ff);
+    hiByte = uint8_t((freqBand[i] >> 8 )& 0x00ff);     
+    EEPROM.write(60+2*i+actualPreset*70,loByte);
+    EEPROM.write(60+1+2*i+actualPreset*70,hiByte);
+    
+    Serial.print("Level: ");
+    Serial.print(levelBand[i]); 
+    Serial.print("Q: ");
+    Serial.print(slopeBand[i]);
+    Serial.print("Fc: ");
+    Serial.println(freqBand[i]);   
+    }
+ Serial.print("saved");
+ Serial.println(actualPreset); 
+    display.setCursor(90, 20);
+    display.print("SAVED");
+    display.display();
+    delay(1000);
+ savePreset = 0;
+ } 
+
+if (loadPreset ==1){
+  for (int i = 0;i<bands;i++){
+    unsigned int hg[i];
+    loByte= EEPROM.read(20+2*i+actualPreset*70);
+    hiByte= EEPROM.read(20+1+2*i+actualPreset*70);
+    levelBand[i] = (float)((hiByte << 8) | loByte)/100; 
+    loByte= EEPROM.read(40+2*i+actualPreset*70);    
+    hiByte= EEPROM.read(40+1+2*i+actualPreset*70);
+    slopeBand[i] = (float)((hiByte << 8) | loByte)/100;     
+    loByte = EEPROM.read(60+2*i+actualPreset*70); 
+    hiByte = EEPROM.read(60+1+i*2+actualPreset*70);     
+    freqBand[i] = (hiByte << 8) | loByte;
+    Serial.print("Level: ");
+    Serial.print(levelBand[i]); 
+    Serial.print("Q: ");
+    Serial.print(slopeBand[i]);
+    Serial.print("Fc: ");
+    Serial.println(freqBand[i]);    
+  }
+  Serial.print("loading..");
+  Serial.println(actualPreset);
+  loadPreset = 0;
+  updateFilter=1;
+    display.setCursor(80, 20);
+    display.print("LOADING");
+    display.display();
+    delay(500);
+ } 
+display.clearDisplay();
+
+//*******************INPUT/OUTPUT LEVEL ADJUST************************
+if (SW1Value == 5){    //LP pos for input level
+ if (!Tap1Value && (Tap1Value == Tap1ValueOld)){    //When Mode/tap is held down you can adjust the input gain of the input
+ // Serial.print("TIME");
+   Tap1Timer++;
+  if (Tap1Timer > 15){
+    InLevel = analogRead(Pot1);
+    InLevel = mapfloat(InLevel,0,1023,10,1);
+    InLevel = InLevel * inLevel; //multiply by constant inLevel
+    dc2.amplitude(InLevel,10);
+    delay(100);
+   // pixels.setPixelColor(1, pixels.Color(120,120,0));
+    //analogWrite(ledPin2, 255); 
+   // pixels.setPixelColor(1, pixels.Color(100,100,0));    
+    //display.clearDisplay();   
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(5, 10);
+    display.print("Input:");
+    display.print(InLevel); 
+    display.display();
+    }
+  }
+  else if (Tap1Timer > 15){    //only write to EEPROM once
+    EEPROM.write(0, InLevel*255);
+  //  Serial.println(InLevel);
+    Tap1Timer = 0;
+  }
+  else if (Tap1Value){
+  //  peak = peak1.read();   //read the signal output peak
+  if (peak == -1)(peak = 0);
+  //analogWrite(ledPin2, peak*100);
+  //pixels.setPixelColor(1, pixels.Color(peak*100,peak*100,0));
+  //pixels.show();
+  }
+}
+
+if (SW1Value == 1){    //HP pos for Output level
+ if (!Tap1Value && (Tap1Value == Tap1ValueOld)){    //When Mode/tap is held down you can adjust the input gain of the input
+ // Serial.print("TIME");
+   Tap1Timer++;
+  if (Tap1Timer > 15){
+    outLevel = analogRead(Pot1);
+    outLevel = mapfloat(outLevel,0,1023,10,1);
+    delay(100);
+   // analogWrite(ledPin2, 255); 
+    //pixels.setPixelColor(1, pixels.Color(70,70,0));
+    //display.clearDisplay();   
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(5, 10);
+    display.print("Output:");
+    display.print(outLevel); 
+    display.display();
+    }
+  }
+  else if (Tap1Timer > 15){    //only write to EEPROM once
+    EEPROM.write(1, outLevel);
+    Tap1Timer = 0;
+  }
+  else if (Tap1Value){
+  //  peak = peak1.read();   //read the signal output peak
+  if (peak == -1)(peak = 0);
+  //analogWrite(ledPin2, peak*100);
+  //pixels.setPixelColor(1, pixels.Color((peak)*100,(peak)*100,0));
+  //pixels.show();
+  }
+}
+///////////////////////////PLOTTING OF FREQ RESPONSE//////////////////////////////////
+
+  for (int i=0; i<6; i++) {
+    int slope = 4;
+    freqBandScaled[i]=fscale(20, maxFreq, 0, 128,freqBand[i],7); //last number indicates the log scaling 1-10
+    levelBandScaled[i]=fscale(0, 80, 20, 68,levelBand[i],1);                             //scale to screen
+    Qlevel[i]=0+(fscale(0, 75, 20, 68,(levelBand[i]-(levelBand[i]*(slopeBand[i]-0.7))),1));  //scale to screen
+    float Qused = 0;
+    if (Qlevel[i] <=2) Qused = fscale(0.1, 0.7, 0.4, 0.7, Qlevel[i],1);
+    else Qused = Qlevel[i];
+    if (i == 0){
+      display.drawLine(freqBandScaled[i]-(slope-slopeBand[i]), 64, freqBandScaled[i], Qused, WHITE);//first slope up to Q
+      display.drawLine(freqBandScaled[i], Qused, freqBandScaled[i]+(slope-slopeBand[i]), levelBandScaled[i], WHITE);//slope from Q to level
+      display.drawLine(freqBandScaled[i]+(slope-slopeBand[i]), levelBandScaled[i],freqBandScaled[i+1]-(slope-slopeBand[i+1]), levelBandScaled[i], WHITE);   
+      }
+    else if (i!=5) {
+      display.drawLine(freqBandScaled[i]-(slope-slopeBand[i]), levelBandScaled[i-1], freqBandScaled[i], Qused, WHITE);//first slope up to Q
+      display.drawLine(freqBandScaled[i], Qused, freqBandScaled[i]+(slope-slopeBand[i]), levelBandScaled[i], WHITE);//slope from Q to level
+      display.drawLine(freqBandScaled[i]+(slope-slopeBand[i]), levelBandScaled[i],freqBandScaled[i+1]-(slope-slopeBand[i+1]), levelBandScaled[i], WHITE);   
+       // display.drawLine(freqBandScaled[i+1], levelBandScaled[i], freqBandScaled[i+1], levelBandScaled[i+1], WHITE);//slope to next band
+        }
+    else if (i == 5){
+      display.drawLine(freqBandScaled[i]-(slope-slopeBand[i]), levelBandScaled[i-1], freqBandScaled[i], Qused, WHITE);//first slope up to Q
+      display.drawLine(freqBandScaled[i], Qused, freqBandScaled[i]+(slope-slopeBand[i]), levelBandScaled[i], WHITE);//slope from Q to level
+      display.drawLine(freqBandScaled[i]+(slope-slopeBand[i]), levelBandScaled[i],128, levelBandScaled[i], WHITE);   
+      }
+   }
+   display.fillCircle(freqBandScaled[actualBand], Qlevel[actualBand], 2,WHITE);
+ 
+ /////////////////////END PLOTTING///////////////////////////////
+ 
+ ////// VU meter ////////////
+VUlag++;
+if (VUlag >0){
+for(int i=3;i<=NUMPIXELS;i++){
+  int lvl = 3+(peak_2*12);       //120*7=840
+  int grade = 360+peak_2*960;
+  //Serial.println(peak_2);
+  grade = grade -(120*lvl);
+  if (i < lvl){
+    pixels.setPixelColor(i, pixels.Color(80,0,0)); // green color.
+  }
+  else if (i == lvl){
+    pixels.setPixelColor(i, pixels.Color(grade,0,0)); // green color.
+  }
+  else     {
+    pixels.setPixelColor(i, pixels.Color(0,0,0)); // no color
+  }
+}
+  pixels.show(); // This sends the updated pixel color to the hardware.  
+ // VUlag = 0;
+}
+///////////end VU meter/////////
+ 
+ // int cpuCap = AudioProcessorUsageMax();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(5, 10);
+  display.print("fc:");
+  int dispFreq = int(freqBand[actualBand]);
+  if (dispFreq >= 5000){
+    dispFreq= dispFreq/1000;
+    display.print(dispFreq); 
+    display.print("k"); 
+  }
+  else   display.print(dispFreq);
+  display.setCursor(50, 10);
+  display.print("Q:");
+  display.print((slopeBand[actualBand]),1); 
+  display.setCursor(90, 10);
+  display.print("Pre:");
+  display.print(actualPreset);   
+  display.display();
+ /*
+   Serial.print(" Last: ");
+   Serial.print(Pot1ValueOld);
+   Serial.print(" Last: ");
+   Serial.println(Pot1Value);
+  
+   Serial.print(" Freq2: ");
+   Serial.print(freqBand[2]);  
+   Serial.print(" Freq3: ");
+   Serial.print(freqBand[3]); 
+   Serial.print(" Freq4: ");
+   Serial.print(freqBand[4]); 
+   Serial.print(" Freq5: ");
+   Serial.println(freqBand[5]);   
+   Serial.print(" Peak2: ");
+   Serial.println(peak_2);   
+   */
+   Pot1ValueOld = Pot1Value;
+   Pot2ValueOld = Pot2Value;   
+   Pot3ValueOld = Pot3Value;
+   Pot4ValueOld = Pot4Value; 
+   SW1ValueOld = SW1Value;
+   SW2ValueOld = SW2Value;
+   Tap1ValueOld = Tap1Value;
+   Tap2ValueOld = Tap2Value;   
+   CV1ValueOld = CV1Value;
+   CV2ValueOld = CV2Value;
+   modFreqOld = modFreq;
+   spanfreqOld = spanfreq;
+   movingfreqOld = movingfreq;
+
+   //AudioInterrupts();
+   //AudioNoInterrupts();
+ //  pixels.show();
+}
+
+
+/* fscale
+ Floating Point Autoscale Function V0.1
+ Paul Badger 2007
+ Modified from code by Greg Shakar
+
+ This function will scale one set of floating point numbers (range) to another set of floating point numbers (range)
+ It has a "curve" parameter so that it can be made to favor either the end of the output. (Logarithmic mapping)
+
+ It takes 6 parameters
+
+ originalMin - the minimum value of the original range - this MUST be less than origninalMax
+ originalMax - the maximum value of the original range - this MUST be greater than orginalMin
+
+ newBegin - the end of the new range which maps to orginalMin - it can be smaller, or larger, than newEnd, to facilitate inverting the ranges
+ newEnd - the end of the new range which maps to originalMax  - it can be larger, or smaller, than newBegin, to facilitate inverting the ranges
+
+ inputValue - the variable for input that will mapped to the given ranges, this variable is constrained to originaMin <= inputValue <= originalMax
+ curve - curve is the curve which can be made to favor either end of the output scale in the mapping. Parameters are from -10 to 10 with 0 being
+          a linear mapping (which basically takes curve out of the equation)
+
+ To understand the curve parameter do something like this: 
+
+ void loop(){
+  for ( j=0; j < 200; j++){
+    scaledResult = fscale( 0, 200, 0, 200, j, -1.5);
+
+    Serial.print(j, DEC);  
+    Serial.print("    ");  
+    Serial.println(scaledResult, DEC); 
+  }  
+}
+
+And try some different values for the curve function - remember 0 is a neutral, linear mapping
+
+To understand the inverting ranges, do something like this:
+
+ void loop(){
+  for ( j=0; j < 200; j++){
+    scaledResult = fscale( 0, 200, 200, 0, j, 0);
+
+    //  Serial.print lines as above
+
+  }  
+}
+
+*/
+/*
+
+#include <math.h>
+
+int j;
+float scaledResult; 
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop(){
+  for ( j=0; j < 200; j++){
+    scaledResult = fscale( 0, 200, 0, 200, j, -1.5);
+
+    Serial.print(j, DEC);  
+    Serial.print("    ");  
+    Serial.println(scaledResult , DEC); 
+  }  
+}
+*/
+float fscale( float originalMin, float originalMax, float newBegin, float
+newEnd, float inputValue, float curve){
+
+  float OriginalRange = 0;
+  float NewRange = 0;
+  float zeroRefCurVal = 0;
+  float normalizedCurVal = 0;
+  float rangedValue = 0;
+  boolean invFlag = 0;
+
+
+  // condition curve parameter
+  // limit range
+
+  if (curve > 10) curve = 10;
+  if (curve < -10) curve = -10;
+
+  curve = (curve * -.1) ; // - invert and scale - this seems more intuitive - postive numbers give more weight to high end on output 
+  curve = pow(10, curve); // convert linear scale into lograthimic exponent for other pow function
+
+  /*
+   Serial.println(curve * 100, DEC);   // multply by 100 to preserve resolution  
+   Serial.println(); 
+   */
+
+  // Check for out of range inputValues
+  if (inputValue < originalMin) {
+    inputValue = originalMin;
+  }
+  if (inputValue > originalMax) {
+    inputValue = originalMax;
+  }
+
+  // Zero Refference the values
+  OriginalRange = originalMax - originalMin;
+
+  if (newEnd > newBegin){ 
+    NewRange = newEnd - newBegin;
+  }
+  else
+  {
+    NewRange = newBegin - newEnd; 
+    invFlag = 1;
+  }
+
+  zeroRefCurVal = inputValue - originalMin;
+  normalizedCurVal  =  zeroRefCurVal / OriginalRange;   // normalize to 0 - 1 float
+
+  /*
+  Serial.print(OriginalRange, DEC);  
+   Serial.print("   ");  
+   Serial.print(NewRange, DEC);  
+   Serial.print("   ");  
+   Serial.println(zeroRefCurVal, DEC);  
+   Serial.println();  
+   */
+
+  // Check for originalMin > originalMax  - the math for all other cases i.e. negative numbers seems to work out fine 
+  if (originalMin > originalMax ) {
+    return 0;
+  }
+
+  if (invFlag == 0){
+    rangedValue =  (pow(normalizedCurVal, curve) * NewRange) + newBegin;
+
+  }
+  else     // invert the ranges
+  {   
+    rangedValue =  newBegin - (pow(normalizedCurVal, curve) * NewRange); 
+  }
+
+  return rangedValue;
+}
+
+//************EEPROM functions****************
+//This function will write a 2 byte (16bit) uint16_t to the eeprom at
+//the specified address to address + 1.
+void EEPROMWrite_uint16_t(int address, uint16_t value)
+      {
+      //Decomposition from a uint16_t to 2 bytes by using bitshift.
+      //One = Most significant -> Two = Least significant byte
+      byte two = ((value >> 0xFF) & 0xFF);
+      byte one = ((value >> 8) & 0xFF);
+
+      //Write the 2 bytes into the eeprom memory.
+      EEPROM.write(address, two);
+      EEPROM.write(address + 1, one);
+      }
+  
+long EEPROMRead_uint16_t(int address)
+      {
+      //Read the 2 bytes from the eeprom memory.
+
+      uint16_t two = EEPROM.read(address);
+      uint16_t one = EEPROM.read(address + 1);
+
+      //Return the recomposed uint16_t by using bitshift.
+      return ((two << 16) & 0xFF) + ((one << 24) & 0xFFFF);
+      }      
+      
