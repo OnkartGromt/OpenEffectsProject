@@ -1,5 +1,3 @@
-#include <Adafruit_GFX.h>
-
 /*
 Grompressor1.ino
 Compressor effect using floating point core. Thanks to Chip Audette! 
