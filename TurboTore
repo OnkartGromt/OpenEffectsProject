@@ -25,9 +25,9 @@ using namespace std;
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
 //Blue HW:
-//#define PIN            8
+#define PIN            8
 //RED HW:
-#define PIN            3
+//#define PIN            3
 
 #define NUMPIXELS      10
 #define bands          6
@@ -114,12 +114,12 @@ int CV1 = A10;
 int CV2 = A11;
 
 //For the RED pcb
-int Tap1 = 0; 
-int Tap2 = 1;
+//int Tap1 = 0; 
+//int Tap2 = 1;
 
 //For Blue PCB:
-//int Tap1 = 2;
-//int Tap2 = 3;
+int Tap1 = 2;
+int Tap2 = 3;
 
 int SW1 = A12;
 int SW2 = A13;
